@@ -29,14 +29,13 @@ class RateLimitInterceptor {
     private fun check(context: InvocationContext): OverRateLimitType {
         context.method
             .getAnnotation(RateLimit::class.java)
-            ?.also(::checkAnnotationValid)
+            ?.apply(::checkAnnotationValid)
             ?.run { verify("${context.javaClass.name}.${context.method.name}", this) }
             ?.let { if (it != OverRateLimitType.OK) return it }
 
         context.method.declaringClass
             .getAnnotation(RateLimit::class.java)
-            ?.also(::checkAnnotationValid)
-            ?.also(::checkAnnotationValid)
+            ?.apply(::checkAnnotationValid)
             ?.run { verify(context.javaClass.name, this) }
             ?.let { if (it != OverRateLimitType.OK) return it }
 

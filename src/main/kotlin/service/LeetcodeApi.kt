@@ -29,7 +29,7 @@ class LeetcodeApi {
 
     private val objectMapper =
         ObjectMapper()
-            .also { it.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false) }
+            .apply { configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false) }
 
     suspend fun fetchQuestions(name: String): List<QuestionModel> {
         val body: String =
