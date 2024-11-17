@@ -1,12 +1,12 @@
 package utils.ratelimit
 
+import enums.OverRateLimitType
 import jakarta.annotation.Priority
 import jakarta.interceptor.AroundInvoke
 import jakarta.interceptor.Interceptor
 import jakarta.interceptor.InvocationContext
 import org.slf4j.LoggerFactory
 import utils.ratelimit.algorithms.RollingWindow
-import utils.ratelimit.enums.OverRateLimitType
 import utils.ratelimit.exceptions.RateLimitAnnotationException
 import utils.ratelimit.exceptions.RateLimitException
 import java.time.temporal.ChronoUnit

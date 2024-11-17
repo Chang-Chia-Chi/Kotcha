@@ -1,21 +1,26 @@
+import io.quarkus.logging.Log
 import io.quarkus.runtime.QuarkusApplication
 import io.quarkus.runtime.annotations.QuarkusMain
 import kotlinx.coroutines.runBlocking
-import service.LeetcodeApi
+import service.LeetcodeService
 
 @QuarkusMain
 class Main(
-    val leetcode: LeetcodeApi,
+    val leetcode: LeetcodeService,
 ) : QuarkusApplication {
     override fun run(vararg args: String?): Int {
         runBlocking {
-            repeat(4) {
-                leetcode
-                    //            .runCatching { fetchQuestions("weekly-contest-406") }
-                    .runCatching { fetchSubmissions("weekly-contest-406", 1, "global") }
-                    .onSuccess { println("fetch success: $it") }
-                    .onFailure { println("fetch failed, $it") }
-            }
+            leetcode
+//                .runCatching { fetchQuestions("weekly-contest-406") }
+                .runCatching {
+                    val iter = fetchSubmissions("weekly-contest-406", listOf(1, 2, 3, 4, 5, 6, 7, 8), "global")
+                    while (iter.hasNext()) {
+                        Log.info("receive submission: [${iter.next()}]")
+                    }
+                }
+//                .runCatching { fetchSubmittedCode("1320214961") }
+                .onSuccess { println("fetch success") }
+                .onFailure { Log.error("fetch failed", it) }
         }
         return 0
     }

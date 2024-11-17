@@ -1,4 +1,4 @@
-package utils.ratelimit.enums
+package enums
 
 enum class OverRateLimitType {
     OK,

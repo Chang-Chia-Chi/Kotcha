@@ -1,7 +1,7 @@
 package utils.ratelimit.algorithms
 
+import enums.OverRateLimitType
 import kotlinx.datetime.Clock
-import utils.ratelimit.enums.OverRateLimitType
 import java.util.*
 import kotlin.math.max
 
