@@ -68,28 +68,30 @@ class HttpResultSet(
             val semaphore = Semaphore(concurrency)
             parameters
                 .map { params ->
-                    async {
-                        try {
-                            semaphore.acquire()
-                            Log.info("start request [$httpMethod] [$endpoint] with params [$params]")
-                            val response =
-                                client.request(endpoint) {
-                                    method = httpMethod
-                                    params.forEach { (name, value) ->
-                                        parameter(name, value)
+                    try {
+                        semaphore.acquire()
+                        async {
+                            try {
+                                Log.info("start request [$httpMethod] [$endpoint] with params [$params]")
+                                val response =
+                                    client.request(endpoint) {
+                                        method = httpMethod
+                                        params.forEach { (name, value) ->
+                                            parameter(name, value)
+                                        }
                                     }
-                                }
-                            Log.info("complete request [$httpMethod] [$endpoint] with params [$params]")
-                            send(response)
-                        } catch (e: CancellationException) {
-                            Log.error("producer cancelled when query api [$endpoint] with params [$params]", e)
-                            throw e
-                        } catch (e: Exception) {
-                            Log.error("unknown error when query api [$endpoint] with params [$params]", e)
-                            throw e
-                        } finally {
-                            semaphore.release()
+                                Log.info("complete request [$httpMethod] [$endpoint] with params [$params]")
+                                send(response)
+                            } catch (e: Exception) {
+                                Log.error("unknown error when query api [$endpoint] with params [$params]", e)
+                                throw e
+                            } finally {
+                                semaphore.release()
+                            }
                         }
+                    } catch (e: CancellationException) {
+                        Log.error("producer cancelled when query api [$endpoint] with params [$params]", e)
+                        throw e
                     }
                 }.awaitAll()
         }
