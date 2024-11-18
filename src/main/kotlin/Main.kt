@@ -3,6 +3,7 @@ import io.quarkus.runtime.QuarkusApplication
 import io.quarkus.runtime.annotations.QuarkusMain
 import kotlinx.coroutines.runBlocking
 import service.LeetcodeService
+import java.util.concurrent.atomic.AtomicInteger
 
 @QuarkusMain
 class Main(
@@ -13,9 +14,10 @@ class Main(
             leetcode
 //                .runCatching { fetchQuestions("weekly-contest-406") }
                 .runCatching {
+                    val counter = AtomicInteger(0)
                     val iter = fetchSubmissions("weekly-contest-406", listOf(1, 2, 3, 4, 5, 6, 7, 8), "global")
                     while (iter.hasNext()) {
-                        Log.info("receive submission: [${iter.next()}]")
+                        Log.info("receive #${counter.incrementAndGet()} submission: [${iter.next()}]")
                     }
                 }
 //                .runCatching { fetchSubmittedCode("1320214961") }

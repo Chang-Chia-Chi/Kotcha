@@ -13,11 +13,9 @@ class HttpResultIterator<T>(
     private val isClosed = AtomicBoolean(false)
 
     override fun hasNext(): Boolean {
-        if (isClosed.get()) return false
+        if (isClosed()) return false
+        if (currItemsHasNext()) return true
 
-        if (currItemsHasNext()) {
-            return true
-        }
         if (rs.hasNext()) {
             val response = rs.next()
             currItems = mapper.map(response)
@@ -29,7 +27,7 @@ class HttpResultIterator<T>(
     }
 
     override fun next(): T {
-        if (isClosed.get()) throw NoSuchElementException("http result iterator has closed")
+        if (isClosed()) throw NoSuchElementException("http result iterator has closed")
 
         if (currItemsHasNext() || hasNext()) {
             val nextItem = currItems?.get(currIdx)
@@ -40,13 +38,16 @@ class HttpResultIterator<T>(
     }
 
     override fun close() {
+        if (isClosed()) Log.warn("http result iterator already closed")
+
         Log.info("start closing iterator")
         isClosed.set(true)
-        rs.close()
         currItems = null
         currIdx = -1
         Log.info("complete closing iterator")
     }
 
     private fun currItemsHasNext(): Boolean = currItems != null && currIdx >= 0 && currIdx < currItems!!.size
+
+    private fun isClosed(): Boolean = isClosed.get()
 }

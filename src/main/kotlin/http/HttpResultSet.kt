@@ -22,7 +22,7 @@ class HttpResultSet(
     AutoCloseable {
     private val dispatcher = Dispatchers.IO
     private val receiveChannel: ReceiveChannel<HttpResponse> = produce()
-    private val isClose = AtomicBoolean(false)
+    private val isClosed = AtomicBoolean(false)
     private var currItem: HttpResponse? = null
 
     override fun hasNext(): Boolean {
@@ -49,11 +49,13 @@ class HttpResultSet(
     }
 
     override fun close() {
-        Log.info("start closing result set")
-        isClose.set(true)
+        if (isClosed()) Log.warn("http result set already closed")
+
+        Log.info("start closing http result set")
+        isClosed.set(true)
         receiveChannel.cancel()
         currItem = null
-        Log.info("complete closing result set")
+        Log.info("complete closing http result set")
     }
 
     fun <T : Any> mapBy(mapper: HttpResponseMapper<T>): HttpResultIterator<T> =
@@ -96,5 +98,5 @@ class HttpResultSet(
                 }.awaitAll()
         }
 
-    private fun isClosed(): Boolean = isClose.get()
+    private fun isClosed(): Boolean = isClosed.get()
 }
