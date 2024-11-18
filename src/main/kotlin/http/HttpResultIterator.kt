@@ -29,12 +29,14 @@ class HttpResultIterator<T>(
     }
 
     override fun next(): T {
+        if (isClosed.get()) throw NoSuchElementException("http result iterator has closed")
+
         if (currItemsHasNext() || hasNext()) {
             val nextItem = currItems?.get(currIdx)
             currIdx++
             return nextItem!!
         }
-        throw NoSuchElementException("http result iterator has no more element or closed ")
+        throw NoSuchElementException("http result iterator has no more element")
     }
 
     override fun close() {
